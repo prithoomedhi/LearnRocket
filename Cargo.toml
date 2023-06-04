@@ -1,0 +1,15 @@
+[package]
+name = "learn-rocket"
+version = "0.1.0"
+edition = "2021"
+author = "Prithoo Medhi <prithoo11335@gmail.com>"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.26"
+prime-checker = "0.2.19"
+rocket = { version = "=0.5.0-rc.3", features = ["json"] }
+rocket_dyn_templates = { version = "=0.1.0-rc.3", features = ["tera"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

@@ -1,0 +1,1 @@
+ROCKET_CLI_COLORS=false cargo run --release
