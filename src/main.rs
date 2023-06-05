@@ -6,7 +6,7 @@ use rocket::{form::validate::contains, serde::json::*, *};
 
 mod libs;
 
-use crate::libs::structures::models::PrimeNumberResponse;
+use crate::libs::structures::models::{PrimeNumberResponse, UserForm, Error, HelloWorldResponse};
 
 #[get("/")]
 fn index() -> &'static str {
@@ -14,7 +14,14 @@ fn index() -> &'static str {
 }
 
 #[get("/hello/<name>/<age>")]
-fn hello(name: String, age: u8) -> String {
+fn hello(name: String, age: u8) -> Json<HelloWorldResponse> {
+    //! This controller is used to demonstrate how to read path variables
+    //! from a request and how to return a basic `json` response.
+    //! 
+    //! Basically, it formats a string with the name and age of the user as provided in the path variables
+    //! and formats a string with the two parameters as well as the current date and time.
+    //! 
+    //! It sends a `json` HTTP response with the formatted string.
     let name = match clean_name(&name) {
         Ok(name) => name,
         Err(e) => panic!("{}", e),
@@ -29,20 +36,34 @@ fn hello(name: String, age: u8) -> String {
         Ok(datetime) => datetime,
         Err(e) => panic!("{}", e),
     };
-    format!(
+    let msg = format!(
         "Hello, my name is {name} and I am {age} years old as of today ({datetime}).",
         age = age,
         name = name.to_uppercase(),
         datetime = datetime
-    )
+    );
+
+    Json(HelloWorldResponse::create(Some(msg)))
 }
 
 #[get("/find-prime/<val>")]
 fn primes(val: u64) -> Json<PrimeNumberResponse> {
-    let primes = find_primes_till(val);
-    let response = PrimeNumberResponse::create(val, primes);
+    let primes: Vec<u64> = find_primes_till(val);
+    let response: PrimeNumberResponse = PrimeNumberResponse::create(val, primes);
 
     Json(response)
+}
+
+#[post("/user", data = "<user_form>")]
+fn user(user_form: Json<UserForm>) -> Result<Json<UserForm>, Json<Error>>  {
+    let user_form = match UserForm::create(user_form.name().to_string(), user_form.email().to_string()){
+        Ok(val) => val,
+        Err(e) => {
+            let error = Error::create(e, None);
+            return Err(Json(error));
+        },
+    };
+    Ok(Json(user_form))
 }
 
 #[launch]
@@ -51,6 +72,7 @@ fn rocket() -> _ {
         .mount("/", routes![index])
         .mount("/", routes![hello])
         .mount("/", routes![primes])
+        .mount("/", routes![user])
 }
 
 fn clean_name(name: &str) -> Result<String, String> {
