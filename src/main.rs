@@ -6,7 +6,7 @@ use rocket::{form::validate::contains, serde::json::*, *};
 
 mod libs;
 
-use crate::libs::structures::models::{PrimeNumberResponse, UserForm, Error, HelloWorldResponse};
+use crate::libs::structures::models::{Error, HelloWorldResponse, PrimeNumberResponse, UserForm};
 
 #[get("/")]
 fn index() -> &'static str {
@@ -17,10 +17,10 @@ fn index() -> &'static str {
 fn hello(name: String, age: u8) -> Json<HelloWorldResponse> {
     //! This controller is used to demonstrate how to read path variables
     //! from a request and how to return a basic `json` response.
-    //! 
+    //!
     //! Basically, it formats a string with the name and age of the user as provided in the path variables
     //! and formats a string with the two parameters as well as the current date and time.
-    //! 
+    //!
     //! It sends a `json` HTTP response with the formatted string.
     let name = match clean_name(&name) {
         Ok(name) => name,
@@ -55,14 +55,15 @@ fn primes(val: u64) -> Json<PrimeNumberResponse> {
 }
 
 #[post("/user", data = "<user_form>")]
-fn user(user_form: Json<UserForm>) -> Result<Json<UserForm>, Json<Error>>  {
-    let user_form = match UserForm::create(user_form.name().to_string(), user_form.email().to_string()){
-        Ok(val) => val,
-        Err(e) => {
-            let error = Error::create(e, None);
-            return Err(Json(error));
-        },
-    };
+fn user(user_form: Json<UserForm>) -> Result<Json<UserForm>, Json<Error>> {
+    let user_form =
+        match UserForm::create(user_form.name().to_string(), user_form.email().to_string()) {
+            Ok(val) => val,
+            Err(e) => {
+                let error = Error::create(e, None);
+                return Err(Json(error));
+            }
+        };
     Ok(Json(user_form))
 }
 
