@@ -6,7 +6,7 @@ use rocket::{form::validate::contains, serde::json::*, *};
 
 mod libs;
 
-use crate::libs::structures::models::{Error, HelloWorldResponse, PrimeNumberResponse, UserForm};
+use crate::libs::schema::models::{Error, HelloWorldResponse, PrimeNumberResponse, UserForm};
 
 #[get("/")]
 fn index() -> &'static str {

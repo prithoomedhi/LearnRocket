@@ -25,6 +25,10 @@ impl PrimeNumberResponse {
     pub fn create(arg: u64, primes: Vec<u64>) -> Self {
         Self { arg, primes }
     }
+
+    pub fn destroy(self) -> (u64, Vec<u64>) {
+        (self.arg, self.primes)
+    }
 }
 
 #[derive(Deserialize, Serialize)]
